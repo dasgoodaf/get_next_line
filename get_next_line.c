@@ -23,6 +23,7 @@ char	*ft_read_file(int fd, char *buffer)
 		buffer[0] = '\0';
 	}
 	temp = malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	temp[0] = '\0';
 	readd = 1;
 	while (readd > 0 && !ft_strchr(temp, '\n'))
 	{
@@ -30,6 +31,8 @@ char	*ft_read_file(int fd, char *buffer)
 		temp[readd] = '\0';
 		buffer = ft_strjoin(buffer, temp);
 	}
+	if (temp)
+		free(temp);
 	return (buffer);
 }
 
@@ -59,7 +62,13 @@ char	*ft_next(char *buffer)
 		i++;
 	if (buffer[i] == '\n')
 		i++;
+	if (!buffer[i])
+	{
+		free(buffer);
+		return (NULL);
+	}
 	temp = ft_substr(buffer, i, ft_strlen(buffer) - i);
+	free(buffer);
 	return (temp);
 }
 
@@ -68,7 +77,11 @@ char	*get_next_line(int fd)
 	static char	*buffer;
 	char		*line;
 
+	if (fd < 0 || BUFFER_SIZE <= 0)
+		return (NULL);
 	buffer = ft_read_file(fd, buffer);
+	if (!buffer)
+		return (NULL);
 	line = ft_get_line(buffer);
 	buffer = ft_next(buffer);
 	return (line);
@@ -85,5 +98,6 @@ int	main(void)
 	{
 		line = get_next_line(fd);
 		printf("%s", line);
+		free(line);
 	}
 }
