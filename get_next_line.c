@@ -15,19 +15,18 @@
 char	*ft_read_file(int fd, char *buffer)
 {
 	char	*temp;
-	size_t	readd;
+	int		readd;
 
 	if (!buffer || !*buffer)
-	{
-		buffer = malloc(sizeof(char) + 1);
-		buffer[0] = '\0';
-	}
+		buffer = ft_strdup("");
 	temp = malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	temp[0] = '\0';
 	readd = 1;
 	while (readd > 0 && !ft_strchr(temp, '\n'))
 	{
 		readd = read(fd, temp, BUFFER_SIZE);
+		if (readd < 0)
+			return (free(temp), free(buffer), NULL);
 		temp[readd] = '\0';
 		buffer = ft_strjoin(buffer, temp);
 	}
@@ -85,19 +84,4 @@ char	*get_next_line(int fd)
 	line = ft_get_line(buffer);
 	buffer = ft_next(buffer);
 	return (line);
-}
-
-int	main(void)
-{
-	int		fd;
-	char	*line;
-
-	fd = open("text", O_RDONLY, 0777);
-	line = "";
-	while (line)
-	{
-		line = get_next_line(fd);
-		printf("%s", line);
-		free(line);
-	}
 }
